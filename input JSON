@@ -1,0 +1,34 @@
+#include <ArduinoJson.h>
+
+String meno;
+String priezvisko;
+int vek;
+
+void setup() 
+{
+  Serial.begin(9600); 
+}
+
+void loop() 
+{
+  // {"meno":"Jozef","priezvisko":"Lisicky","vek":"30"}
+  if (Serial.available()>0) 
+  {
+      String command=Serial.readString();
+    
+      DynamicJsonBuffer jsonBuffer;
+      JsonObject& root= jsonBuffer.parseObject(command);
+      
+       if (root.success()) 
+       {
+          meno = root["meno"].asString();
+          Serial.println(meno);
+
+          priezvisko = root["priezvisko"].asString();
+          Serial.println(priezvisko);
+          
+          vek = atoi(root["vek"]);
+          Serial.println(vek);
+       }
+  }
+}
