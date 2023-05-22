@@ -1,0 +1,70 @@
+
+#include <Wire.h>
+
+#define eeprom B1010000
+
+char valueMemory[50];
+String msgStringMemory;
+
+void writeAT24( int deviceAddress, unsigned int msgReadAddress, byte* data, byte dataLength ) 
+{
+  Wire.beginTransmission(deviceAddress);
+  Wire.write((int)(msgReadAddress >> 8));
+  Wire.write((int)(msgReadAddress & 0xFF));
+  byte c;
+  for ( c = 0; c < dataLength; c++)
+  {
+    Wire.write(data[c]);
+  }
+  Wire.endTransmission();
+}
+
+void readAT24( int deviceAddress, unsigned int readAddress, byte *buffer, int dataLength ) 
+{
+  Wire.beginTransmission(deviceAddress);
+  Wire.write((int)(readAddress >> 8)); 
+  Wire.write((int)(readAddress & 0xFF)); 
+  Wire.endTransmission();
+  Wire.requestFrom(deviceAddress,dataLength);
+  int c = 0;
+  for ( c = 0; c < dataLength; c++ )
+  {
+    if (Wire.available())
+    {
+      buffer[c] = Wire.read();
+    }
+  }
+}
+
+void saveToMemory(String i)
+{
+  msgStringMemory = i;
+  msgStringMemory.toCharArray(valueMemory, sizeof(valueMemory));
+  writeAT24(eeprom, 100, (byte *)valueMemory, sizeof(valueMemory));
+}
+
+void loadPositionFromMemory()
+{
+  readAT24(eeprom, 100, (byte *)valueMemory, sizeof(valueMemory));
+  delay(100);
+  String msgStringMemory_m(valueMemory);
+  msgStringMemory = msgStringMemory_m;
+}
+
+
+void setup() 
+{
+    Serial.begin(9600);
+    Serial.println("...");
+    loadPositionFromMemory();
+}
+
+
+void loop() 
+{
+
+    saveToMemory("save value");
+    delay(1000);
+    Serial.println(msgStringMemory);
+
+}
