@@ -1,0 +1,24 @@
+void setup() 
+{
+  Serial.begin(9600); 
+}
+
+void loop() 
+{
+  if (Serial.available()>0) 
+  {
+      String command=Serial.readString();
+
+      // remove newline char variant 1
+      //command.remove(command.length()-1, 1);
+
+      // remove newline char variant 2
+      command.replace("\n","");
+      command.replace("\r","");
+      command.replace("\n\r","");
+      command.replace("\r\n","");
+      
+      Serial.println(command);
+      Serial.println(command.length());
+  }
+}
