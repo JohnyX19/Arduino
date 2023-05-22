@@ -1,0 +1,46 @@
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT = SoftwareSerial(50,51);
+
+void setup() 
+{
+  BT.begin(9600);
+  pinMode(13, OUTPUT);
+}
+
+void loop() 
+{
+  if(BT.available())
+  {
+    String vstup = ""; 
+    while(BT.available()) 
+    {
+      char input = BT.read(); 
+      vstup += String(input); 
+    }
+    vstup.toLowerCase();
+    vstup.replace("\n",""); 
+
+    if(vstup == "zapni") 
+    {
+      digitalWrite(13, HIGH);
+      BT.println("On");
+    }
+
+    else if(vstup == "vypni") 
+    {
+      digitalWrite(13, LOW);
+      BT.println("Off");
+    }
+    else 
+    {
+      BT.println("Neni validni prikaz. Napis \"zapni\" pre zapnutie alebo \"vypni\" pre vypnutie ");
+    }
+
+    vstup = ""; 
+  }
+}
+
+
+
