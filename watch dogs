@@ -1,0 +1,26 @@
+
+
+#include <avr/wdt.h>
+
+void setup() 
+{
+    Serial.begin(9600);
+    Serial.println("Watchdog Demo Starting");
+    
+    wdt_disable();  /* Disable the watchdog and wait for more than 2 seconds */
+    delay(3000);  /* Done so that the Arduino doesn't keep resetting infinitely in case of wrong configuration */
+    wdt_enable(WDTO_2S);  /* Enable the watchdog with a timeout of 2 seconds */
+}
+
+
+void loop() 
+{
+    for(int i = 0; i<20; i++) 
+    {
+      delay(200);
+      Serial.println(i);
+      wdt_reset();  /* Reset the watchdog */
+    }
+    while(1); // po 2 sekundach bez resetu "wdt_reset()", sa resetne kod arduina
+}
+
