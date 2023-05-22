@@ -1,0 +1,31 @@
+//zapojenie : SCL - A5, SDA -A4
+
+#include <Wire.h>
+#include <MPU6050_light.h>
+
+MPU6050 mpu(Wire);
+unsigned long timer = 0;
+
+void setup() 
+{
+    Serial.begin(9600);                  
+    Wire.begin();
+    mpu.begin();    
+    mpu.calcGyroOffsets(); 
+}
+
+void loop() 
+{
+  mpu.update();  
+  if((millis()-timer)>10) 
+  {              
+      Serial.print(" X : ");
+      Serial.print(mpu.getAngleX());
+      Serial.print(" Y : ");
+      Serial.print(mpu.getAngleY());
+      Serial.print(" Z : ");
+      Serial.print(mpu.getAngleZ());
+      Serial.println();
+      timer = millis();  
+  }
+}
