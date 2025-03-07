@@ -1,0 +1,73 @@
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <DHT.h>
+
+// Definovanie OLED displeja
+#define SCREEN_WIDTH 128  
+#define SCREEN_HEIGHT 32  
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+// Definovanie DHT22
+#define DHTPIN 2       // DHT22 je pripojený na digitálny pin 2
+#define DHTTYPE DHT22  // Používam DHT22
+DHT dht(DHTPIN, DHTTYPE);
+
+void setup() 
+{
+    Serial.begin(115200);
+
+    // Inicializácia OLED displeja, ak nejde 0x3C možem vyskúšať 0x3D, 
+    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) 
+    {
+        Serial.println("Chyba: OLED displej nenájdený!");
+        while (1);
+    }
+
+    Serial.println("OLED inicializovaný.");
+
+    // Inicializácia DHT22
+    dht.begin();
+    display.clearDisplay();
+    display.display();
+}
+
+void loop() 
+{
+    float teplota = dht.readTemperature();
+    float vlhkost = dht.readHumidity();
+
+    // Overenie, či sú údaje platné
+    if (isnan(teplota) || isnan(vlhkost)) 
+    {
+        Serial.println("Chyba pri čítaní z DHT22!");
+        return;
+    }
+
+    // Výpis do Serial Monitoru
+    Serial.print("Teplota: ");
+    Serial.print(teplota);
+    Serial.print(" °C | Vlhkosť: ");
+    Serial.print(vlhkost);
+    Serial.println(" %");
+
+    // Aktualizácia OLED displeja
+    display.clearDisplay();
+    display.setTextSize(1);   // Veľkosť textu
+    display.setTextColor(SSD1306_WHITE);
+    
+    display.setCursor(10, 5);  // Umiestnenie textu
+    display.print("Teplota: ");
+    display.print(teplota);
+    display.print(" C");
+
+    display.setCursor(10, 20);
+    display.print("Vlhkost: ");
+    display.print(vlhkost);
+    display.print(" %");
+
+    display.display();  // Obnovenie displeja
+
+    delay(2000);  // Čaká 2 sekundy medzi meraniami
+}
+
